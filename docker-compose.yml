@@ -73,7 +73,7 @@ services:
       - ./config.alloy:/etc/alloy/config.alloy:ro
       - alloy_storage:/var/lib/alloy/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:12345/-/ready"]
+      test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/127.0.0.1/12345'"]
       interval: 10s
       timeout: 5s
       retries: 10
