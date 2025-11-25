@@ -8,7 +8,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.254.5.0/24
+        - subnet: 10.254.6.0/24
 
 x-logging: &default-logging
   driver: "json-file"
