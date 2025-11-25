@@ -1,0 +1,31 @@
+// ---------- general config ----------
+
+logging {
+        level  = "info"
+        format = "logfmt"
+}
+
+prometheus.remote_write "cloud" {
+        endpoint {
+                url = "https://<YOUR_PROMETHEUS_ENDPOINT>.grafana.net/api/prom/push"
+                basic_auth {
+                        username = "<YOUR_USERNAME>"
+                        password = "<YOUR_PASSWORD>"
+                }
+        }
+        wal {
+                truncate_frequency  = "2h"
+                min_keepalive_time  = "10m"
+                max_keepalive_time  = "12h"
+        }
+        external_labels = { site = constants.hostname }
+}
+
+// ---------- speedtest scrape job ----------
+
+prometheus.scrape "speedtest" {
+        targets         = [ { "__address__" = "127.0.0.1:9110" } ]
+        scrape_interval = "60m"
+        scrape_timeout  = "60s"
+        forward_to      = [ prometheus.remote_write.cloud.receiver ]
+}

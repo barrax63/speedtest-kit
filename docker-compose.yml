@@ -1,0 +1,92 @@
+name: speedtest-kit
+
+volumes:
+  alloy_storage:
+
+networks:
+  main:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.254.5.0/24
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-security-baseline: &security-baseline
+  security_opt:
+    - no-new-privileges:true
+    - apparmor=docker-default
+  cap_drop:
+    - ALL
+
+services:
+  speedtest:
+    <<: *security-baseline
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: speedtest
+    networks: ['main']
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./speedtest_v2.py:/etc/speedtest/speedtest_v2.py:ro
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/127.0.0.1/9110'"]
+      interval: 2m
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging: *default-logging
+
+  alloy:
+    <<: *security-baseline
+    image: grafana/alloy:latest
+    hostname: alloy
+    networks: ['main']
+    restart: unless-stopped
+    cap_add:
+      - CHOWN
+      - FOWNER
+      - DAC_OVERRIDE
+      - SETUID
+      - SETGID
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - alloy_storage:/var/lib/alloy/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:12345/-/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    depends_on:
+      speedtest:
+        condition: service_healthy
+    logging: *default-logging
