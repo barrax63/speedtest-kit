@@ -38,7 +38,7 @@ services:
     tmpfs:
       - /tmp
     volumes:
-      - ./speedtest_v2.py:/etc/speedtest/speedtest_v2.py:ro
+      - ./speedtest_v3.py:/etc/speedtest/speedtest_v3.py:ro
     healthcheck:
       test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/127.0.0.1/9110'"]
       interval: 2m
