@@ -72,6 +72,7 @@ services:
     volumes:
       - ./config.alloy:/etc/alloy/config.alloy:ro
       - alloy_storage:/var/lib/alloy/data
+    command: ["run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data", "--disable-reporting"]
     healthcheck:
       test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/127.0.0.1/12345'"]
       interval: 10s
