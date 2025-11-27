@@ -29,6 +29,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: barrax63/speedtest-exporter:latest
     hostname: speedtest
     networks: ['main']
     restart: unless-stopped
@@ -39,12 +40,6 @@ services:
       - /tmp
     volumes:
       - ./speedtest_v3.py:/etc/speedtest/speedtest_v3.py:ro
-    healthcheck:
-      test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/127.0.0.1/9110'"]
-      interval: 2m
-      timeout: 3s
-      retries: 3
-      start_period: 30s
     deploy:
       resources:
         limits:
