@@ -18,13 +18,13 @@ prometheus.remote_write "cloud" {
                 min_keepalive_time  = "10m"
                 max_keepalive_time  = "12h"
         }
-        external_labels = { site = constants.hostname }
+        external_labels = { site = "<YOUR_HOSTNAME>" }
 }
 
 // ---------- speedtest scrape job ----------
 
 prometheus.scrape "speedtest" {
-        targets         = [ { "__address__" = "127.0.0.1:9110" } ]
+        targets         = [ { "__address__" = "speedtest:9110" } ]
         scrape_interval = "60m"
         scrape_timeout  = "60s"
         forward_to      = [ prometheus.remote_write.cloud.receiver ]
