@@ -26,6 +26,6 @@ prometheus.remote_write "cloud" {
 prometheus.scrape "speedtest" {
         targets         = [ { "__address__" = "speedtest:9110" } ]
         scrape_interval = "60m"
-        scrape_timeout  = "60s"
+        scrape_timeout  = "120s"
         forward_to      = [ prometheus.remote_write.cloud.receiver ]
 }
